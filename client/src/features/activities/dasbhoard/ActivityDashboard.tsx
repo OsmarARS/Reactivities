@@ -12,8 +12,6 @@ type ActivityDashboardProps = {
   handleOpenForm: (id: Activity['id']) => void;
   handleFormClose: () => void;
   editMode: boolean;
-  handleSubmitForm: (activity: Activity) => void;
-  handleDelete: (id: Activity['id']) => void;
 };
 
 export default function ActivityDashboard({
@@ -24,14 +22,11 @@ export default function ActivityDashboard({
   handleOpenForm,
   handleFormClose,
   editMode,
-  handleSubmitForm,
-  handleDelete,
 }: ActivityDashboardProps) {
   return (
     <Grid container spacing={3}>
       <Grid size={7}>
         <ActivityList
-          handleDelete={handleDelete}
           activities={activities}
           handleSelectActivity={handleSelectActivity}
         />
@@ -39,7 +34,7 @@ export default function ActivityDashboard({
       <Grid size={5}>
         {selectedActivity && !editMode && (
           <ActivityDetail
-            activity={selectedActivity}
+            selectedActivity={selectedActivity}
             handleCancelSelectActivity={handleCancelSelectActivity}
             handleOpenForm={handleOpenForm}
           />
@@ -48,7 +43,6 @@ export default function ActivityDashboard({
           <ActivityForm
             handleFormClose={handleFormClose}
             activity={selectedActivity}
-            handleSubmitForm={handleSubmitForm}
           />
         )}
       </Grid>
