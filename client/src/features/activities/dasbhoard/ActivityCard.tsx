@@ -9,15 +9,14 @@ import {
 } from '@mui/material';
 import type { Activity } from '../../../lib/types';
 import { useActivities } from '../../../lib/hooks/useActivities';
+import { Link } from 'react-router';
 
 type ActivityCardProps = {
   activity: Activity;
-  handleSelectActivity: (id: Activity['id']) => void;
 };
 
 export default function ActivityCard({
   activity,
-  handleSelectActivity,
 }: ActivityCardProps) {
   const { deleteActivity } = useActivities();
 
@@ -39,7 +38,8 @@ export default function ActivityCard({
         <Chip label={activity.category} variant="outlined" />
         <Box display="flex" gap={3}>
           <Button
-            onClick={() => handleSelectActivity(activity.id)}
+            component={Link}
+            to={`/activities/${activity.id}`}
             size="medium"
             variant="contained"
           >

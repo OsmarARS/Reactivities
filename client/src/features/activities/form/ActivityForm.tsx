@@ -2,17 +2,12 @@ import { Box, Button, Paper, TextField, Typography } from '@mui/material';
 import type { Activity } from '../../../lib/types';
 import type { SubmitEvent } from 'react';
 import { useActivities } from '../../../lib/hooks/useActivities';
+import { useNavigate, useParams } from 'react-router';
 
-type ActivityFormProps = {
-  activity?: Activity;
-  handleFormClose: () => void;
-};
-
-export default function ActivityForm({
-  activity,
-  handleFormClose,
-}: ActivityFormProps) {
-  const { updateActivity, createActivity } = useActivities();
+export default function ActivityForm() {
+  const { id } = useParams();
+  const { updateActivity, createActivity, activity, isLoadingActivity } = useActivities(id);
+  const navigate = useNavigate();
 
   const handleSubmit = async (e: SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -26,18 +21,23 @@ export default function ActivityForm({
     if (activity) {
       data.id = activity.id;
       await updateActivity.mutateAsync(data as unknown as Activity);
-      handleFormClose();
+      navigate(`/activities/${activity.id}`)
       return;
     }
 
-    await createActivity.mutateAsync(data as unknown as Activity);
-    handleFormClose();
+    createActivity.mutate(data as unknown as Activity, {
+      onSuccess: (id) => {
+        navigate(`/activities/${id}`)
+      }
+    });
   };
+
+  if (isLoadingActivity) return <Typography>Loading...</Typography>
 
   return (
     <Paper sx={{ borderRadius: 3, padding: 3 }}>
       <Typography variant="h5" gutterBottom color="primary">
-        Create activity
+        {activity ? 'Edit Activity' : 'Create Activity'}
       </Typography>
       <Box
         onSubmit={handleSubmit}
@@ -72,7 +72,7 @@ export default function ActivityForm({
         <TextField name="city" label="City" defaultValue={activity?.city} />
         <TextField name="venue" label="Venue" defaultValue={activity?.venue} />
         <Box display="flex" justifyContent="end" gap={3}>
-          <Button onClick={handleFormClose} color="inherit">
+          <Button color="inherit">
             Cancel
           </Button>
           <Button
