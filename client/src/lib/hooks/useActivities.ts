@@ -1,9 +1,11 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import type { Activity } from '../types';
 import agent from '../api/agent';
+import { useLocation } from 'react-router';
 
 export const useActivities = (id?: Activity['id']) => {
   const queryClient = useQueryClient();
+  const location = useLocation();
 
   const { data: activities, isPending } = useQuery({
     queryKey: ['activities'],
@@ -11,16 +13,17 @@ export const useActivities = (id?: Activity['id']) => {
       const response = await agent.get<Activity[]>('/activities');
       return response.data;
     },
+    enabled: !id && location.pathname === '/activities',
   });
 
   const { data: activity, isLoading: isLoadingActivity } = useQuery({
     queryKey: ['activities', id],
     queryFn: async () => {
-      const response = await agent.get<Activity>(`/activities/${id}`)
+      const response = await agent.get<Activity>(`/activities/${id}`);
       return response.data;
     },
-    enabled: !!id
-  })
+    enabled: !!id,
+  });
 
   const updateActivity = useMutation({
     mutationFn: async (activity: Activity) => {
@@ -63,6 +66,6 @@ export const useActivities = (id?: Activity['id']) => {
     createActivity,
     deleteActivity,
     activity,
-    isLoadingActivity
+    isLoadingActivity,
   };
 };
